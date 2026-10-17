@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cultivation All-in-One Calculator</title>
+<style>
+:root{--bg:#080914;--card:#151525;--card2:#202039;--text:#f5f2ff;--muted:#aaa6c2;--purple:#9b5cff;--blue:#54d9ff;--gold:#e8b66a;--green:#35d07f;--red:#ff6478;--border:#49445f}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:radial-gradient(circle at 10% 10%,#35105f 0,transparent 30%),radial-gradient(circle at 90% 20%,#063e58 0,transparent 30%),linear-gradient(135deg,#070711,#111126 50%,#071722)}
+.app{width:min(1200px,94%);margin:auto;padding:20px 0 50px} header{text-align:center;padding:12px 0 20px}h1{margin:0;font-size:clamp(28px,6vw,48px)}.sub{color:var(--gold);font-weight:bold;margin-top:8px}.tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:8px 0 20px}.tab,button{border:0;border-radius:11px;padding:12px 15px;font-weight:800;cursor:pointer}.tab{background:#27243c;color:#ddd}.tab.active,.primary{background:linear-gradient(90deg,var(--purple),#6d8cff);color:white}.panel{display:none}.panel.active{display:block}.card{background:linear-gradient(145deg,rgba(28,27,48,.97),rgba(11,18,31,.97));border:1px solid var(--border);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 35px #0008}h2,h3{margin-top:0}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}label{display:block;color:var(--muted);font-size:13px;margin:12px 0 7px}input,select{width:100%;padding:13px;border-radius:11px;border:1px solid #4d4865;background:#0d0d1b;color:white;font-size:16px;outline:none}input:focus,select:focus{border-color:var(--blue)}button{background:#29273b;color:#eee}.buttons{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.buttons button{flex:1;min-width:140px}.result{text-align:center;padding:20px}.value{font-size:clamp(30px,7vw,54px);font-weight:900;color:var(--gold);word-break:break-word}.formula{color:var(--muted);font-size:13px;margin-top:8px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:#090b18aa;border-radius:14px;padding:15px}.stat span{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}.stat strong{font-size:20px}.green{color:var(--green)}.red{color:var(--red)}.purple{color:#b794ff}.method-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.method.active{background:#4d2b83;border:1px solid var(--purple)}.choice.active{background:linear-gradient(90deg,var(--purple),#6d8cff);color:white}.breakdown{background:#090b18aa;border-radius:14px;padding:16px}.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff12;color:var(--muted)}.row:last-child{border-bottom:0}.row b{color:var(--text);text-align:right}.winner{border-color:var(--green)}.loser{border-color:var(--red)}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:10px 7px;border-bottom:1px solid #39354d;text-align:left}th{color:var(--gold);font-size:12px}td:last-child,th:last-child{text-align:right}.note{font-size:12px;color:var(--muted);line-height:1.55}.small{font-size:12px;color:var(--muted)}@media(max-width:850px){.grid2,.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.grid2,.grid3,.grid4,.stats,.method-grid{grid-template-columns:1fr}.app{width:94%}.tab{flex:1}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>⚔️ Cultivation All-in-One Calculator</h1><div class="sub">POWER • BATTLE • CRYSTAL ACCUMULATION</div></header>
+<div class="tabs">
+<button class="tab active" onclick="showTab('battle',this)">⚔ Battle Power</button>
+<button class="tab" onclick="showTab('path',this)">☯ Path Multipliers</button>
+<button class="tab" onclick="showTab('crystal',this)">💎 Crystal Accumulation</button>
+</div>
+
+<section id="battle" class="panel active">
+<div class="grid2">
+<div class="card"><h2>Battle Type</h2><div class="buttons"><button id="sameBtn" class="choice active" onclick="setBattleType('same')">Same Faction</button><button id="diffBtn" class="choice" onclick="setBattleType('different')">Different Faction</button></div>
+<label>Advantaged Side</label><select id="advantagedSide"><option value="player">Your Side is Advantaged</option><option value="opponent">Opponent is Advantaged</option><option value="none">No Faction Advantage</option></select>
+<div class="note" id="battleInfo">Same Faction: Advantaged +5% / Disadvantaged -5%</div></div>
+<div class="card"><h2>Battle Rules</h2><div class="row"><span>Same advantage</span><b>+5%</b></div><div class="row"><span>Same disadvantage</span><b class="red">-5%</b></div><div class="row"><span>Different advantage</span><b>+10%</b></div><div class="row"><span>Different disadvantage</span><b class="red">-10%</b></div></div>
+</div>
+<div class="grid2">
+<div class="card" id="playerCard"><h2>🛡 Your Side</h2>
+<label>Base Combat Power</label><input id="playerBase" type="number" min="0" value="100000">
+<label>Heaven Formation</label><select id="playerHF" onchange="toggleCustom('player')"><option value="0">None — 0%</option><option value="2">HF Level 1 — 2%</option><option value="5">HF Level 2 — 5%</option><option value="7">HF Level 3 — 7%</option><option value="10">HF Level 4 — 10%</option><option value="15">HF Level 5 — 15%</option><option value="custom">Custom HF %</option></select>
+<div id="playerCustomWrap" style="display:none"><label>Custom HF %</label><input id="playerCustomHF" type="number" min="0" value="0"></div>
+<label>Element Natal / Extra Flat Power</label><input id="playerNatal" type="number" min="0" value="0">
+<label>Methods / Amplifications</label><div class="method-grid">
+<button class="method" data-side="player" data-method="wm" onclick="toggleMethod(this)">Water Mystic<br><small>+5%</small></button>
+<button class="method" data-side="player" data-method="dw" onclick="toggleMethod(this)">Divine Water<br><small>+3%</small></button>
+<button class="method" data-side="player" data-method="df" onclick="toggleMethod(this)">Divine Fire<br><small>+3%</small></button>
+<button class="method" data-side="player" data-method="dt" onclick="toggleMethod(this)">Divine Tree<br><small>+3%</small></button>
+<button class="method" data-side="player" data-method="fm" onclick="toggleMethod(this)">Freedom Mindset<br><small>+20%</small></button>
+<button class="method" data-side="player" data-method="fs" onclick="toggleMethod(this)">Fire Steps<br><small>+20%</small></button>
+<button class="method" data-side="player" data-method="os" onclick="toggleMethod(this)">Ocean Suppression<br><small>+20%</small></button>
+<button class="method" data-side="player" data-method="ui" onclick="toggleMethod(this)">Universal Illumination<br><small>+20%</small></button></div></div>
+<div class="card" id="opponentCard"><h2>⚔ Opponent</h2>
+<label>Base Combat Power</label><input id="opponentBase" type="number" min="0" value="100000">
+<label>Heaven Formation</label><select id="opponentHF" onchange="toggleCustom('opponent')"><option value="0">None — 0%</option><option value="2">HF Level 1 — 2%</option><option value="5">HF Level 2 — 5%</option><option value="7">HF Level 3 — 7%</option><option value="10">HF Level 4 — 10%</option><option value="15">HF Level 5 — 15%</option><option value="custom">Custom HF %</option></select>
+<div id="opponentCustomWrap" style="display:none"><label>Custom HF %</label><input id="opponentCustomHF" type="number" min="0" value="0"></div>
+<label>Element Natal / Extra Flat Power</label><input id="opponentNatal" type="number" min="0" value="0">
+<label>Methods / Amplifications</label><div class="method-grid">
+<button class="method" data-side="opponent" data-method="wm" onclick="toggleMethod(this)">Water Mystic<br><small>+5%</small></button>
+<button class="method" data-side="opponent" data-method="dw" onclick="toggleMethod(this)">Divine Water<br><small>+3%</small></button>
+<button class="method" data-side="opponent" data-method="df" onclick="toggleMethod(this)">Divine Fire<br><small>+3%</small></button>
+<button class="method" data-side="opponent" data-method="dt" onclick="toggleMethod(this)">Divine Tree<br><small>+3%</small></button>
+<button class="method" data-side="opponent" data-method="fm" onclick="toggleMethod(this)">Freedom Mindset<br><small>+20%</small></button>
+<button class="method" data-side="opponent" data-method="fs" onclick="toggleMethod(this)">Fire Steps<br><small>+20%</small></button>
+<button class="method" data-side="opponent" data-method="os" onclick="toggleMethod(this)">Ocean Suppression<br><small>+20%</small></button>
+<button class="method" data-side="opponent" data-method="ui" onclick="toggleMethod(this)">Universal Illumination<br><small>+20%</small></button></div></div></div>
+<div class="card"><h2>📊 Live Battle Results</h2><div class="stats"><div class="stat"><span>Your Final Power</span><strong id="playerFinal" class="purple">0</strong></div><div class="stat"><span>Opponent Final Power</span><strong id="opponentFinal">0</strong></div><div class="stat"><span>Winning Side Gain</span><strong id="winnerGain" class="green">0</strong></div><div class="stat"><span>Losing Side Reduction</span><strong id="loserLoss" class="red">0</strong></div></div><div class="result"><h2 id="winnerText">Battle Result</h2><div id="differenceText" class="formula"></div></div>
+<div class="grid2"><div class="breakdown" id="pBreak"></div><div class="breakdown" id="oBreak"></div></div><div class="buttons"><button class="primary" onclick="calculateBattle()">CALCULATE BATTLE</button><button onclick="resetBattle()">RESET</button></div></div>
+</section>
+
+<section id="path" class="panel">
+<div class="card"><h2>☯ Cultivation Path Amplification</h2><div class="grid2"><div><label>Starting Power</label><input id="pathPower" type="number" min="0" step="any" value="1000"></div><div><label>Path</label><select id="pathType"><option value="same">Same Path</option><option value="diff">Different Path</option></select></div><div><label>Method</label><select id="pathMethod"><option value="normal">Normal</option><option value="dw">DW</option><option value="wm">WM</option><option value="both">DW + WM</option></select></div><div><label>Optional Extra Power</label><input id="pathExtra" type="number" step="any" value="0"></div></div><div class="buttons"><button class="primary" onclick="calculatePath()">CALCULATE</button><button onclick="resetPath()">RESET</button></div></div>
+<div class="card result"><div class="small" id="pathLabel"></div><div class="value" id="pathResult"></div><div class="formula" id="pathFormula"></div></div>
+<div class="card"><h3>All Amplifications</h3><table><thead><tr><th>Path</th><th>Method</th><th>Multiplier</th><th>Result</th></tr></thead><tbody id="pathTable"></tbody></table></div>
+</section>
+
+<section id="crystal" class="panel">
+<div class="card"><h2>⚡ Accumulation Calculator</h2><label>Speed per second</label><input id="speed" type="number" min="0" step="any" value="3"><label>Time</label><div class="grid3"><input id="hours" type="number" min="0" step="any" value="2" placeholder="Hours"><input id="minutes" type="number" min="0" step="any" value="0" placeholder="Minutes"><input id="seconds" type="number" min="0" step="any" value="0" placeholder="Seconds"></div><div class="buttons"><button class="primary" onclick="calculateCrystal()">CALCULATE</button></div><div class="result"><div>Total Crystal</div><div class="value" id="crystalTotal"></div><div class="formula" id="crystalFormula"></div></div></div>
+<div class="card"><h2>🏦 Crystal Bank Calculator</h2><label>Total Crystal Bank</label><input id="bank" type="number" min="0" step="any" value="100000"><label>Percentage</label><div class="grid2"><input id="pct" type="number" min="0" max="100" step="any" value="10"><select id="preset" onchange="setPct(this.value)"><option value="">Quick %</option><option>1</option><option>5</option><option>10</option><option>25</option><option>50</option><option>75</option><option>100</option></select></div><div class="result"><div>Crystal Value</div><div class="value" id="bankValue"></div><div class="formula" id="bankFormula"></div></div></div>
+</section>
+</div>
+<script>
+const $=id=>document.getElementById(id), n=id=>Math.max(0,Number($(id).value)||0), fmt=x=>Number(x).toLocaleString(undefined,{maximumFractionDigits:10}), f2=x=>Number(x).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4});
+function showTab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');b.classList.add('active')}
+let battleType='same';const methodPct={wm:5,dw:3,df:3,dt:3,fm:20,fs:20,os:20,ui:20};const active={player:{wm:false,dw:false,df:false,dt:false,fm:false,fs:false,os:false,ui:false},opponent:{wm:false,dw:false,df:false,dt:false,fm:false,fs:false,os:false,ui:false}};
+function setBattleType(t){battleType=t;$('sameBtn').classList.toggle('active',t==='same');$('diffBtn').classList.toggle('active',t==='different');$('battleInfo').textContent=t==='same'?'Same Faction: Advantaged +5% / Disadvantaged -5%':'Different Faction: Advantaged +10% / Disadvantaged -10%';calculateBattle()}
+function toggleMethod(b){let s=b.dataset.side,m=b.dataset.method;active[s][m]=!active[s][m];b.classList.toggle('active',active[s][m]);calculateBattle()}
+function toggleCustom(s){$(s+'CustomWrap').style.display=$(s+'HF').value==='custom'?'block':'none';calculateBattle()}
+function hf(s){return $(s+'HF').value==='custom'?n(s+'CustomHF'):Number($(s+'HF').value)}
+function faction(s){let a=$('advantagedSide').value;if(a==='none')return 0;let v=battleType==='same'?5:10;return a===s?v:-v}
+function methods(s){return Object.entries(active[s]).reduce((a,[k,v])=>a+(v?methodPct[k]:0),0)}
+function side(s){
+  let base=n(s+'Base'), natal=n(s+'Natal');
+  let fp=faction(s), fc=base*fp/100;
+  let h=hf(s), mp=methods(s);
+  // Advantage: BP + faction effect + HF/Method percentages.
+  // HF/Method percentages are applied to the BP after the faction effect.
+  // Disadvantage: the faction reduction is applied to BP, then HF/Method
+  // bonuses are added to that adjusted power.
+  let factionAdjusted=base+fc;
+  let hv=factionAdjusted*h/100;
+  let mv=factionAdjusted*mp/100;
+  let amp=h+mp, av=hv+mv;
+  let final=factionAdjusted+natal+hv+mv;
+  return{base,natal,fp,fc,h,hv,mp,mv,amp,av,final,factionAdjusted}
+}
+function signed(x){return x>0?'+'+fmt(x):x<0?'-'+fmt(Math.abs(x)):'0'}
+function breakdown(x,title){return `<h3>${title}</h3><div class="row"><span>Base Combat Power</span><b>${fmt(x.base)}</b></div><div class="row"><span>Faction Effect</span><b>${x.fp}% (${signed(x.fc)})</b></div><div class="row"><span>Element Natal</span><b>+${fmt(x.natal)}</b></div><div class="row"><span>Heaven Formation</span><b>+${fmt(x.h)}% (${fmt(x.hv)})</b></div><div class="row"><span>Methods Total</span><b>+${fmt(x.mp)}% (${fmt(x.mv)})</b></div><div class="row"><span>HF/Method Basis</span><b>${fmt(x.factionAdjusted)}</b></div><div class="row"><span>Total Amplification</span><b>+${fmt(x.amp)}% (+${fmt(x.av)})</b></div><div class="row"><span>Final Power</span><b>${fmt(x.final)}</b></div>`}
+function calculateBattle(){let p=side('player'),o=side('opponent'),d=Math.abs(p.final-o.final);$('playerFinal').textContent=fmt(p.final);$('opponentFinal').textContent=fmt(o.final);let gain=0,loss=0,msg,detail;if(p.final>o.final){gain=p.final-p.base;loss=o.base-o.final;msg='🏆 Your Side Wins!';detail='You are stronger by '+fmt(d)+' Combat Power.'}else if(o.final>p.final){gain=o.final-o.base;loss=p.base-p.final;msg='☠ Opponent Wins!';detail='Opponent is stronger by '+fmt(d)+' Combat Power.'}else{msg='🤝 Draw!';detail='Power Difference: 0'}$('winnerGain').textContent=signed(gain);$('loserLoss').textContent=signed(loss);$('winnerText').textContent=msg;$('differenceText').textContent=detail;$('pBreak').innerHTML=breakdown(p,'🛡 Your Calculation');$('oBreak').innerHTML=breakdown(o,'⚔ Opponent Calculation');$('playerCard').classList.remove('winner','loser');$('opponentCard').classList.remove('winner','loser');if(p.final>o.final){$('playerCard').classList.add('winner');$('opponentCard').classList.add('loser')}else if(o.final>p.final){$('opponentCard').classList.add('winner');$('playerCard').classList.add('loser')}}
+function resetBattle(){['playerBase','opponentBase'].forEach(id=>$(id).value=100000);['playerNatal','opponentNatal','playerCustomHF','opponentCustomHF'].forEach(id=>$(id).value=0);['playerHF','opponentHF'].forEach(id=>$(id).value='0');$('advantagedSide').value='player';battleType='same';$('sameBtn').classList.add('active');$('diffBtn').classList.remove('active');$('battleInfo').textContent='Same Faction: Advantaged +5% / Disadvantaged -5%';Object.keys(active).forEach(s=>Object.keys(active[s]).forEach(m=>active[s][m]=false));document.querySelectorAll('.method').forEach(b=>b.classList.remove('active'));['playerCustomWrap','opponentCustomWrap'].forEach(id=>$(id).style.display='none');calculateBattle()}
+const M={same:{normal:1.1,dw:1.133,wm:1.155,both:1.188},diff:{normal:1.2,dw:1.236,wm:1.26,both:1.296}},names={normal:'Normal',dw:'DW',wm:'WM',both:'DW + WM'};
+function calculatePath(){let p=n('pathPower'),e=Number($('pathExtra').value)||0,path=$('pathType').value,m=$('pathMethod').value,mult=M[path][m],r=p*mult+e;$('pathResult').textContent=f2(r);$('pathLabel').textContent=(path==='same'?'Same Path':'Different Path')+' • '+names[m]+' • ×'+mult.toFixed(3);$('pathFormula').textContent=f2(p)+' × '+mult.toFixed(3)+' + '+f2(e)+' = '+f2(r);let out='';for(let pa of ['same','diff'])for(let me of ['normal','dw','wm','both'])out+=`<tr><td>${pa==='same'?'Same':'Different'}</td><td>${names[me]}</td><td>×${M[pa][me].toFixed(3)}</td><td>${f2(p*M[pa][me]+e)}</td></tr>`;$('pathTable').innerHTML=out}
+function resetPath(){$('pathPower').value=1000;$('pathExtra').value=0;$('pathType').value='same';$('pathMethod').value='normal';calculatePath()}
+function calculateCrystal(){let speed=n('speed'),h=n('hours'),m=n('minutes'),s=n('seconds'),sec=h*3600+m*60+s,total=speed*sec;$('crystalTotal').textContent=fmt(total);$('crystalFormula').textContent=fmt(speed)+' × '+fmt(sec)+' seconds = '+fmt(total)+' crystals'}
+function calculateBank(){let bank=n('bank'),pct=Math.min(100,Math.max(0,Number($('pct').value)||0)),v=bank*pct/100;$('pct').value=pct;$('bankValue').textContent=fmt(v);$('bankFormula').textContent=fmt(pct)+'% of '+fmt(bank)+' crystals'}
+function setPct(v){if(v){$('pct').value=v;calculateBank()}}
+document.querySelectorAll('input,select').forEach(e=>{e.addEventListener('input',()=>{calculateBattle();calculatePath();calculateCrystal();calculateBank()});e.addEventListener('change',()=>{calculateBattle();calculatePath();calculateCrystal();calculateBank()})});
+calculateBattle();calculatePath();calculateCrystal();calculateBank();
+</script>
+<script>
+(function(){
+  const KEY='cultivationCalculator.v1';
+  function save(){
+    const data={fields:{}, methods:[]};
+    document.querySelectorAll('input,select').forEach(el=>{if(el.id)data.fields[el.id]=el.value;});
+    document.querySelectorAll('.method.active').forEach(el=>data.methods.push(el.dataset.side+':'+el.dataset.method));
+    try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}
+  }
+  try{
+    const data=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(data){
+      Object.entries(data.fields||{}).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value;});
+      (data.methods||[]).forEach(key=>{
+        const [side,method]=key.split(':');
+        const el=document.querySelector('.method[data-side="'+side+'"][data-method="'+method+'"]');
+        if(el && typeof toggleMethod==='function' && !el.classList.contains('active'))toggleMethod(el);
+      });
+      ['player','opponent'].forEach(side=>{
+        const hf=document.getElementById(side+'HF'), wrap=document.getElementById(side+'CustomWrap');
+        if(hf&&wrap)wrap.style.display=hf.value==='custom'?'block':'none';
+      });
+      if(typeof calculateBattle==='function')calculateBattle();
+      if(typeof calculatePath==='function')calculatePath();
+      if(typeof calculateCrystal==='function')calculateCrystal();
+      if(typeof calculateBank==='function')calculateBank();
+    }
+  }catch(e){}
+  document.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',save);el.addEventListener('change',save);});
+  document.querySelectorAll('button').forEach(el=>el.addEventListener('click',()=>setTimeout(save,0)));
+  window.addEventListener('pagehide',save);
+})();
+</script>
+
+</body></html>

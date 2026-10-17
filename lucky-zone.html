@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TEAM KINSE Lucky Zone Showdown</title>
+<style>
+:root{
+  --bg:#120d0a; --panel:#4b2b1f; --panel2:#67422c; --gold:#e7c47c;
+  --cream:#f5dfad; --red:#c94b42; --blue:#3f7fbc; --green:#59b875;
+  --ink:#2b1913; --muted:#bda77e;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;color:#f8e8bd;background:
+radial-gradient(circle at 50% -10%,#4d3266 0,transparent 25%),
+radial-gradient(circle at 50% 10%,#291b18 0,transparent 48%),
+linear-gradient(180deg,#100b09,#27150f 60%,#120b08);min-height:100vh}
+.app{max-width:980px;margin:auto;padding:10px 10px 30px}
+.topbar{height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #87633a;color:var(--cream)}
+.brand{font-size:22px;letter-spacing:7px;font-weight:700}
+.wallet{background:linear-gradient(#503323,#2e1b13);border:1px solid #b99250;border-radius:18px;padding:10px 16px;font-size:20px;box-shadow:inset 0 0 15px #0008}
+.small{font-family:Arial,sans-serif;font-size:12px;color:#d8c49c}
+.stage{position:relative;margin-top:12px;border:2px solid #9b7745;border-radius:22px;overflow:hidden;background:
+radial-gradient(ellipse at 50% 0%,#74493a 0,transparent 40%),
+linear-gradient(180deg,#3b2118,#20110c);box-shadow:0 15px 40px #0009}
+.characters{display:grid;grid-template-columns:1fr 1.3fr 1fr;align-items:center;min-height:250px;padding:12px}
+.character{text-align:center;font-weight:700;color:#f0d7a3;text-shadow:0 3px #000}
+.avatar{width:88px;height:88px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-size:48px;border:4px solid var(--gold);background:linear-gradient(145deg,#6b241d,#d65b46);box-shadow:0 0 0 5px #2b1810}
+.avatar.bull{background:linear-gradient(145deg,#204d7a,#5fa6df)}
+.table-center{text-align:center}
+.status{font-family:Arial,sans-serif;font-weight:800;font-size:clamp(22px,4vw,36px);color:#fff1c9;text-shadow:0 3px #24130d}
+.timer{font-family:Arial,sans-serif;font-size:52px;font-weight:900;color:#f3bd65;line-height:1;margin:7px}
+.substatus{color:#d9c298;font-family:Arial,sans-serif;font-size:14px;min-height:20px}
+.cards{display:flex;justify-content:center;gap:7px;margin:8px 0 0;min-height:88px}.kicker-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:430px;margin:6px auto 0}.kickers{min-height:70px}.kicker-label{text-align:center}
+.card{width:52px;height:76px;border-radius:6px;background:#f6f1e5;color:#201914;border:2px solid #d4c8b2;box-shadow:0 5px 10px #0007;padding:4px;font:bold 22px Georgia;position:relative}
+.card.red{color:#bb352e}.card .suit{position:absolute;bottom:4px;right:5px;font-size:28px}
+.card.back{background:repeating-linear-gradient(45deg,#a32631,#a32631 7px,#f1c6c3 7px,#f1c6c3 11px);border-color:#f1c6c3;color:transparent}
+.result-ribbon{display:none;margin:4px auto 12px;max-width:560px;padding:10px 16px;border-radius:20px;background:#f1d28e;color:#3b2015;font-family:Arial;font-weight:900;font-size:22px;box-shadow:0 0 0 2px #8e6538}
+.result-ribbon.show{display:block}
+.bets{padding:10px;background:linear-gradient(#5b3827,#3e2419);border-top:2px solid #b88b52}
+.main-bets{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:10px}
+.bet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.bet-zone{border:2px solid #c5a36c;border-radius:13px;min-height:105px;padding:8px;cursor:pointer;user-select:none;background:linear-gradient(145deg,#f3dba5,#c9a266);color:#392116;position:relative;box-shadow:inset 0 0 16px #fff4,0 5px 10px #0006;transition:.12s transform,.12s filter}
+.bet-zone:hover{transform:translateY(-2px);filter:brightness(1.06)}
+.bet-zone.disabled{opacity:.45;pointer-events:none}
+.bet-zone.selected{outline:4px solid #f4e1a3;box-shadow:0 0 18px #ffd97c, inset 0 0 16px #fff4}
+.bet-title{font-family:Arial,sans-serif;font-size:clamp(14px,2.2vw,20px);font-weight:900;line-height:1.05}
+.mult{color:#a43e31;font-family:Arial,sans-serif;font-weight:900;margin-top:5px}
+.stake{position:absolute;right:7px;bottom:6px;background:#3a2518;color:#ffe8a6;border-radius:14px;padding:4px 8px;font:bold 13px Arial;min-width:30px;text-align:center}
+.rounds{position:absolute;left:7px;bottom:7px;color:#6b3a22;font:bold 10px Arial;letter-spacing:.2px;right:7px;white-space:nowrap}
+.rounds .hit{color:#2f8b52;font-size:13px}
+.rounds .miss{color:#a63d32;font-size:13px}
+.rounds .never{color:#8d2630;font-weight:900;font-size:11px;letter-spacing:.5px}
+.section-label{color:#f1ddb0;text-align:center;font:bold 16px Arial;margin:9px 0 6px}
+.controls{position:sticky;bottom:0;margin-top:12px;padding:10px;background:#21130e;border:2px solid #87633a;border-radius:18px;display:grid;grid-template-columns:1.2fr repeat(4,1fr) .8fr;gap:8px;z-index:5}
+.chip,.clear{border:2px solid #b99b63;border-radius:12px;background:linear-gradient(#548f84,#2f5e59);color:#eff4d5;font:bold 25px Arial;padding:12px 5px;cursor:pointer;box-shadow:0 4px 8px #0008}
+.chip.active{outline:3px solid #ffe19b;filter:brightness(1.2)}
+.clear{background:linear-gradient(#9b5544,#6d3027);font-size:15px}
+.rules{margin-top:14px;background:#4b2d20;border:2px solid #a98554;border-radius:18px;padding:14px;color:#f3dfb2;font-family:Arial,sans-serif}
+.rules h2{text-align:center;margin:0 0 10px;font-family:Georgia}
+.rules summary{cursor:pointer;font-weight:800}
+.rules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:14px;line-height:1.5}
+.log{margin-top:10px;font:13px Arial;color:#e5c88e;max-height:90px;overflow:auto;padding:8px;background:#24140e;border-radius:8px}
+.note{font:12px Arial;color:#cdb98e;margin-top:8px}
+@media(max-width:650px){
+ .app{padding:4px}.topbar{height:52px}.brand{font-size:16px;letter-spacing:4px}.wallet{font-size:16px;padding:8px 11px}
+ .characters{grid-template-columns:1fr;gap:4px;padding:8px;min-height:0}.character{display:none}.table-center{order:-1}.cards{margin-top:8px}
+ .card{width:42px;height:62px;font-size:18px}.card .suit{font-size:22px}
+ .main-bets{gap:5px}.bet-grid{grid-template-columns:repeat(2,1fr);gap:6px}.bet-zone{min-height:86px;padding:6px}.bet-title{font-size:14px}
+ .controls{grid-template-columns:1fr 1fr 1fr 1fr 1fr .75fr;gap:5px;padding:6px}.chip{font-size:20px;padding:10px 2px}
+ .rules-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div><div class="brand">TEAM KINSE</div><div class="small">Cowboy vs Bull • Pure RNG Table</div></div>
+    <div class="wallet"><span class="small">FUND</span> 🪙 <span id="balance">1000</span></div>
+  </header>
+
+  <main class="stage">
+    <div class="characters">
+      <div class="character"><div class="avatar">🤠</div><div>COWBOY</div><div id="cowboyPower" class="small"></div></div>
+      <div class="table-center">
+        <div id="status" class="status">PLACE YOUR BETS</div>
+        <div id="timer" class="timer">15</div>
+        <div id="substatus" class="substatus">Betting is open • stacks are allowed</div>
+        <div class="small" style="margin-top:8px;color:#d8c49c">COMMON TABLE CARDS</div>
+        <div id="boardCards" class="cards"></div>
+        <div class="kicker-row">
+          <div><div class="small kicker-label">🤠 COWBOY KICKERS</div><div id="cowboyCards" class="cards kickers"></div></div>
+          <div><div class="small kicker-label">🐂 BULL KICKERS</div><div id="bullCards" class="cards kickers"></div></div>
+        </div>
+        <div id="resultRibbon" class="result-ribbon"></div>
+      </div>
+      <div class="character"><div class="avatar bull">🐂</div><div>BULL</div><div id="bullPower" class="small"></div></div>
+    </div>
+
+    <section class="bets">
+      <div class="main-bets">
+        <div class="bet-zone" data-zone="cowboy"><div class="bet-title">🤠 COWBOY WIN</div><div class="mult">x2</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="tie"><div class="bet-title">⚖️ TIE</div><div class="mult">x20</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="bull"><div class="bet-title">🐂 BULL WIN</div><div class="mult">x2</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+      </div>
+      <div class="section-label">LUCKY ZONES — bets stack when tapped again</div>
+      <div class="bet-grid">
+        <div class="bet-zone" data-zone="suitedConnectorLucky"><div class="bet-title">SUITED / CONNECTOR / SUITED CONNECTOR</div><div class="mult">x1.66</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="highCardOnePair"><div class="bet-title">HIGH CARD / ONE PAIR</div><div class="mult">x2.2</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="twoPair"><div class="bet-title">TWO PAIRS</div><div class="mult">x3.1</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="pair"><div class="bet-title">PAIR / ANY PAIR</div><div class="mult">x8.5</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="tripsStraightFlush"><div class="bet-title">THREE KIND / STRAIGHT / FLUSH</div><div class="mult">x4.7</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="fullHouse"><div class="bet-title">FULL HOUSE</div><div class="mult">x20</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="aa"><div class="bet-title">AA</div><div class="mult">x100</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+        <div class="bet-zone" data-zone="premium"><div class="bet-title">FOUR KIND / STRAIGHT FLUSH / ROYAL</div><div class="mult">x248</div><div class="stake">0</div><div class="rounds">ROUNDS: 0</div></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="controls">
+    <button class="chip active" data-chip="50">50</button>
+    <button class="chip" data-chip="100">100</button>
+    <button class="chip" data-chip="500">500</button>
+    <button class="chip" data-chip="1000">1000</button>
+    <button class="chip" data-chip="5000">5K</button>
+    <button id="clear" class="clear">CLEAR</button>
+  </div>
+
+  <section class="rules">
+    <h2>Event Rules</h2>
+    <details open>
+      <summary>How the table works</summary>
+      <div class="rules-grid">
+        <div>• Every round starts with a <b>15-second countdown</b>.<br>• Betting is open only while the timer is above 0.<br>• Tapping the same lucky zone again <b>adds another stack</b> to that zone. Every lucky zone stays available permanently; its <b>ROUNDS</b> counter shows how many completed rounds have passed since that zone last hit.<br>• At 0, all bets lock. One shared 5-card table is completed and each side reveals 2 kicker cards. The first table card was already visible during betting.</div>
+        <div>• Each side builds the strongest 5-card poker pattern from the 5 shared table cards + its own 2 kickers. The stronger poker hand wins: <b>Royal Flush &gt; Straight Flush &gt; Four of a Kind &gt; Full House &gt; Flush &gt; Straight &gt; Three of a Kind &gt; Two Pairs &gt; One Pair &gt; High Card</b>.<br>• Equal hands are a tie after normal kicker comparison.<br>• Lucky Zone: the <b>winning side's kicker cards</b> can hit <b>Suited / Connector / Suited Connector</b>, plus kicker <b>Pair</b> and <b>AA</b>. <b>Pair / Any Pair</b> only hits when the winner's kicker cards themselves are a pair. The <b>High Card / One Pair, Two Pairs, Three of a Kind / Straight / Flush, Full House, and Four of a Kind / Straight Flush / Royal Flush</b> zones only hit from the winning side's completed poker pattern.<br>• Kicker-based and completed-pattern zones can both hit in the same round.<br>• Every round is generated from a freshly shuffled deck using browser RNG.</div>
+      </div>
+      <div class="note">Fund safety: the starting fund is 1,000. If your fund is below the minimum bet of 50 at the start of a betting phase, it is automatically replenished to 1,000.</div>
+    </details>
+    <div id="log" class="log">Game ready. Round 1 is open. Lucky zones never expire. Kicker and pattern zones may both hit.</div>
+  </section>
+</div>
+
+<script>
+const MIN_BET=50, START_FUND=1000, ROUND_SECONDS=15, REVEAL_SECONDS=4;
+const mult={cowboy:2,tie:20,bull:2,suitedConnectorLucky:1.66,highCardOnePair:2.2,twoPair:3.1,pair:8.5,tripsStraightFlush:4.7,fullHouse:20,aa:100,premium:248};
+let balance=START_FUND, chip=50, locked=false, seconds=ROUND_SECONDS, bets=Object.fromEntries(Object.keys(mult).map(k=>[k,0])), phase='bet', interval=null, currentRound=null;
+let luckyRounds=Object.fromEntries(Object.keys(mult).map(k=>[k,0])); // consecutive rounds without a hit
+let luckyHistory=Object.fromEntries(Object.keys(mult).map(k=>[k,[]])); // last 7 rounds: true = hit, false = miss
+let completedRounds=0;
+const ranks=['2','3','4','5','6','7','8','9','10','J','Q','K','A'], suits=['♠','♥','♦','♣'];
+const rv=r=>r==='A'?14:r==='K'?13:r==='Q'?12:r==='J'?11:+r;
+const el=id=>document.getElementById(id);
+function log(s){const d=el('log');d.innerHTML=`<div>• ${s}</div>`+d.innerHTML}
+function money(n){return Math.floor(n*100)/100}
+function counterMarkup(k){
+ const misses=luckyRounds[k]||0;
+ if(misses>=50) return `<span class="never">${misses} NEVER OUT</span>`;
+ const history=luckyHistory[k]||[];
+ if(!history.length) return '<span class="miss">×</span>';
+ return history.map(hit=>hit?'<span class="hit">✓</span>':'<span class="miss">×</span>').join(' ');
+}
+function update(){
+ el('balance').textContent=money(balance).toLocaleString();
+ el('timer').textContent=seconds;
+ document.querySelectorAll('.bet-zone').forEach(z=>{
+   const k=z.dataset.zone, stake=z.querySelector('.stake');
+   stake.textContent=bets[k]?money(bets[k]).toLocaleString():'0';
+   const rounds=z.querySelector('.rounds'); if(rounds) rounds.innerHTML=counterMarkup(k);
+   z.classList.toggle('selected',bets[k]>0);
+   z.classList.toggle('disabled',locked);
+ });
+ document.querySelectorAll('.chip').forEach(b=>b.classList.toggle('active',+b.dataset.chip===chip));
+}
+function deck(){let d=[];for(const r of ranks)for(const s of suits)d.push({r,s,v:rv(r)});for(let i=d.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}return d}
+function evalFive(h){
+ const vals=h.map(c=>c.v).sort((a,b)=>b-a), counts={}; vals.forEach(v=>counts[v]=(counts[v]||0)+1);
+ const groups=Object.entries(counts).map(([v,n])=>[+v,n]).sort((a,b)=>b[1]-a[1]||b[0]-a[0]);
+ const flush=h.every(c=>c.s===h[0].s);
+ let uniq=[...new Set(vals)].sort((a,b)=>b-a), straightHigh=0;
+ if(uniq.length===5){if(uniq[0]-uniq[4]===4)straightHigh=uniq[0];else if(JSON.stringify(uniq)===JSON.stringify([14,5,4,3,2]))straightHigh=5}
+ if(flush&&straightHigh===14&&uniq.includes(10))return {cat:9,t:[14],name:'Royal Flush',cards:h};
+ if(flush&&straightHigh)return {cat:8,t:[straightHigh],name:'Straight Flush',cards:h};
+ if(groups[0][1]===4)return {cat:7,t:[groups[0][0],groups.find(g=>g[1]===1)[0]],name:'Four of a Kind',cards:h};
+ if(groups[0][1]===3&&groups[1][1]===2)return {cat:6,t:[groups[0][0],groups[1][0]],name:'Full House',cards:h};
+ if(flush)return {cat:5,t:vals,name:'Flush',cards:h};
+ if(straightHigh)return {cat:4,t:[straightHigh],name:'Straight',cards:h};
+ if(groups[0][1]===3)return {cat:3,t:[groups[0][0],...groups.filter(g=>g[1]===1).map(g=>g[0]).sort((a,b)=>b-a)],name:'Three of a Kind',cards:h};
+ if(groups[0][1]===2&&groups[1][1]===2){let ps=groups.filter(g=>g[1]===2).map(g=>g[0]).sort((a,b)=>b-a);return {cat:2,t:[...ps,groups.find(g=>g[1]===1)[0]],name:'Two Pairs',cards:h};}
+ if(groups[0][1]===2)return {cat:1,t:[groups[0][0],...groups.filter(g=>g[1]===1).map(g=>g[0]).sort((a,b)=>b-a)],name:'One Pair',cards:h};
+ return {cat:0,t:vals,name:'High Card',cards:h};
+}
+function bestHand(cards){
+ let best=null;
+ for(let a=0;a<cards.length-4;a++)for(let b=a+1;b<cards.length-3;b++)for(let c=b+1;c<cards.length-2;c++)for(let d=c+1;d<cards.length-1;d++)for(let e=d+1;e<cards.length;e++){
+   const x=evalFive([cards[a],cards[b],cards[c],cards[d],cards[e]]);
+   if(!best||compare(x,best)>0)best=x;
+ }
+ return best;
+}
+function compare(a,b){if(a.cat!==b.cat)return a.cat>b.cat?1:-1;for(let i=0;i<Math.max(a.t.length,b.t.length);i++){if((a.t[i]||0)!==(b.t[i]||0))return a.t[i]>b.t[i]?1:-1}return 0}
+function renderCards(id,hand,back=false){el(id).innerHTML=hand.map(c=>back?'<div class="card back"></div>':`<div class="card ${c.s==='♥'||c.s==='♦'?'red':''}"><div>${c.r}</div><div class="suit">${c.s}</div></div>`).join('')}
+function anySuited(hands){return hands.some(h=>new Set(h.map(c=>c.s)).size<5)}
+function anyConnector(hands){return hands.some(h=>{let a=[...new Set(h.map(c=>c.v))].sort((x,y)=>x-y);for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++)if(a[j]-a[i]===1)return true;return a.includes(14)&&a.includes(2)})}
+function anySuitedConnector(hands){return hands.some(h=>{for(let i=0;i<5;i++)for(let j=i+1;j<5;j++){let d=Math.abs(h[i].v-h[j].v);if(h[i].s===h[j].s&&(d===1||(h[i].v===14&&h[j].v===2)||(h[j].v===14&&h[i].v===2)))return true}return false})}
+function hasAA(hands){return hands.some(h=>h.filter(c=>c.v===14).length>=2)}
+function kickerZoneHit(zone, winner, winnerHand){
+  // Lucky Zones use the WINNING side's two kicker cards.
+  const kickers = winner === 'cowboy' ? currentRound.cow : currentRound.bull;
+  const suited = kickers[0].s === kickers[1].s;
+  const connector = Math.abs(kickers[0].v-kickers[1].v)===1 ||
+    (kickers.some(c=>c.v===14) && kickers.some(c=>c.v===2));
+  const pair = kickers[0].v === kickers[1].v;
+  const aa = kickers[0].v === 14 && kickers[1].v === 14;
+
+  // Suited / Connector / Suited Connector also hits for kicker Pair and AA.
+  if(zone==='suitedConnectorLucky') return suited || connector || pair || aa;
+
+  // Pair / Any Pair only hits when the winner's kicker cards are a pair.
+  if(zone==='pair') return pair;
+
+  // Pattern zones are based ONLY on the winning side's completed hand.
+  if(zone==='highCardOnePair') return winnerHand.cat===0 || winnerHand.cat===1;
+  if(zone==='twoPair') return winnerHand.cat===2;
+  if(zone==='tripsStraightFlush') return winnerHand.cat===3 || winnerHand.cat===4 || winnerHand.cat===5;
+  if(zone==='fullHouse') return winnerHand.cat===6;
+  if(zone==='aa') return aa;
+  if(zone==='premium') return winnerHand.cat===7 || winnerHand.cat===8 || winnerHand.cat===9;
+  return false;
+}
+
+function categoryHit(zone,cow,bull,ec,eb){
+  const cmp=compare(ec,eb);
+  const winner=cmp>0?'cowboy':cmp<0?'bull':'tie';
+  if(winner==='tie') return false;
+
+  const winnerHand=winner==='cowboy'?ec:eb;
+
+  // Kicker-based zones and pattern-based zones are independent,
+  // so both can hit in the same round.
+  return kickerZoneHit(zone,winner,winnerHand);
+}
+function resetBets(){Object.keys(bets).forEach(k=>bets[k]=0)}
+function newRound(){
+ const d=deck();
+ currentRound={board:d.slice(0,5),cow:d.slice(5,7),bull:d.slice(7,9)};
+}
+function renderRoundHidden(){
+ renderCards('boardCards',[currentRound.board[0]],false);
+ el('boardCards').innerHTML += [1,2,3,4].map(()=>'<div class="card back"></div>').join('');
+ renderCards('cowboyCards',currentRound.cow,true);
+ renderCards('bullCards',currentRound.bull,true);
+}
+
+function saveGameState(){
+  try{
+    localStorage.setItem('teamKinseLuckyZone.v1',JSON.stringify({
+      balance,chip,seconds,locked,phase,bets,luckyRounds,luckyHistory,completedRounds,currentRound
+    }));
+  }catch(e){}
+}
+function restoreGameState(){
+  try{
+    const s=JSON.parse(localStorage.getItem('teamKinseLuckyZone.v1')||'null');
+    if(!s)return false;
+    if(typeof s.balance==='number')balance=s.balance;
+    if(typeof s.chip==='number')chip=s.chip;
+    if(s.bets)bets=Object.assign(bets,s.bets);
+    if(s.luckyRounds)luckyRounds=Object.assign(luckyRounds,s.luckyRounds);
+    if(s.luckyHistory)luckyHistory=Object.assign(luckyHistory,s.luckyHistory);
+    if(typeof s.completedRounds==='number')completedRounds=s.completedRounds;
+    if(s.currentRound)currentRound=s.currentRound;
+    // Start a fresh playable round while retaining the player's fund and historical zone stats.
+    // Pending bets are refunded on refresh so an interrupted round cannot consume them.
+    const pending=Object.values(bets).reduce((a,b)=>a+(Number(b)||0),0);
+    if(pending>0){balance+=pending;log('Previous unfinished bets were refunded after the page was reopened.');}
+    resetBets();
+    return true;
+  }catch(e){return false;}
+}
+
+function startBetting(){
+ if(balance<MIN_BET){balance=START_FUND;log('Fund was below the minimum bet and has been replenished to 1,000.')}
+ resetBets(); newRound(); locked=false; phase='bet'; seconds=ROUND_SECONDS;
+ el('status').textContent='PLACE YOUR BETS';el('substatus').textContent='1 common card is revealed • 4 common cards and both kickers are hidden';
+ el('resultRibbon').classList.remove('show');
+ renderRoundHidden();
+ update();
+ clearInterval(interval); interval=setInterval(tick,1000);
+}
+function tick(){
+ seconds--; if(seconds>0){update();return}
+ clearInterval(interval); lockAndReveal();
+}
+function lockAndReveal(){
+ completedRounds++;
+ locked=true;phase='reveal';update();el('status').textContent='BETS LOCKED';el('substatus').textContent='Revealing 4 common cards and both 2-card kickers...';
+ const {board,cow,bull}=currentRound;
+ renderCards('boardCards',board);
+ renderCards('cowboyCards',cow);renderCards('bullCards',bull);
+ const cowSeven=[...board,...cow], bullSeven=[...board,...bull];
+ const ec=bestHand(cowSeven), eb=bestHand(bullSeven), cmp=compare(ec,eb);
+ const outcome=cmp>0?'cowboy':cmp<0?'bull':'tie';
+ const outcomeText=outcome==='cowboy'?'🤠 COWBOY WINS':outcome==='bull'?'🐂 BULL WINS':'⚖️ TIE';
+ // Resolve every zone every round, even if no bet was placed.
+ // A check means Cowboy or Bull hit that zone; an X means neither side hit it.
+ const zoneHits={};
+ for(const z of Object.keys(mult)){
+   zoneHits[z]=z==='cowboy'?outcome==='cowboy'
+     :z==='bull'?outcome==='bull'
+     :z==='tie'?outcome==='tie'
+     :categoryHit(z,cowSeven,bullSeven,ec,eb);
+   luckyHistory[z].push(zoneHits[z]);
+   if(luckyHistory[z].length>7) luckyHistory[z].shift();
+   luckyRounds[z]=zoneHits[z]?0:(luckyRounds[z]+1);
+ }
+
+ let total=0;
+ for(const [z,stake] of Object.entries(bets)){
+   if(stake&&zoneHits[z]) total+=stake*mult[z];
+ }
+ balance+=total;
+ el('status').textContent=outcomeText;
+ el('substatus').textContent=`Best pattern: Cowboy ${ec.name} • Bull ${eb.name}`;
+ el('resultRibbon').textContent=total>0?`YOU WON 🪙 ${money(total).toLocaleString()}`:'NO WIN THIS ROUND';
+ el('resultRibbon').classList.add('show');
+ log(`${outcomeText} — shared board + 2 kickers each: ${ec.name} vs ${eb.name}. ${total>0?'Paid '+money(total):'No winning bets'}.`);
+ update();
+ seconds=REVEAL_SECONDS;
+ let revealTimer=setInterval(()=>{seconds--;el('timer').textContent=seconds;if(seconds<=0){clearInterval(revealTimer);startBetting()}},1000);
+}
+document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{chip=+b.dataset.chip;update()});
+document.querySelectorAll('.bet-zone').forEach(z=>z.onclick=()=>{
+ if(locked)return;
+ const k=z.dataset.zone;
+ if(balance<chip){log(`Not enough fund for a ${chip} bet.`);return}
+ balance-=chip;bets[k]+=chip;log(`${chip} stacked on ${z.querySelector('.bet-title').textContent}.`);update();
+});
+el('clear').onclick=()=>{
+ if(locked)return;
+ let refund=Object.values(bets).reduce((a,b)=>a+b,0);balance+=refund;resetBets();log(`All open bets cleared. Refunded ${money(refund)}.`);update();
+};
+restoreGameState();
+startBetting();
+</script>
+</body>
+</html>
