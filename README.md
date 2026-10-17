@@ -23,3 +23,5 @@ No build step or server is needed for this browser-local version.
 
 ## If you need accounts and cross-device persistence
 A static website cannot securely keep each person's progress on a server by itself. For users to log in and have their own sessions follow them across devices, add authentication and a database (for example Supabase or Firebase) and store each user's game state under their account. That requires backend configuration and privacy/security rules.
+
+- Landing page also links to [WePlay Philippines](https://weplayapp.com/en-PH/).
